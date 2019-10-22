@@ -5,7 +5,25 @@ import mergeClassNames from 'merge-class-names';
 import { tileProps } from './shared/propTypes';
 
 export default class Tile extends Component {
-  static getDerivedStateFromProps(nextProps, prevState) {
+  state = {};
+
+  constructor(props) {
+    super(props);
+    const {
+      date,
+      view,
+      tileClassName,
+      tileContent,
+    } = props;
+    this.state = { // eslint-disable-line
+      tileClassName: typeof tileClassName === 'function' ? tileClassName({ date, view }) : tileClassName,
+      tileClassNameProps: tileClassName,
+      tileContent: typeof tileContent === 'function' ? tileContent({ date, view }) : tileContent,
+      tileContentProps: tileContent,
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
     const {
       date,
       tileClassName,
@@ -13,22 +31,25 @@ export default class Tile extends Component {
       view,
     } = nextProps;
 
-    const nextState = {};
+    const {
+      tileClassNameProps,
+      tileContentProps,
+    } = this.state;
 
-    if (tileClassName !== prevState.tileClassNameProps) {
-      nextState.tileClassName = typeof tileClassName === 'function' ? tileClassName({ date, view }) : tileClassName;
-      nextState.tileClassNameProps = tileClassName;
+    if (tileClassName !== tileClassNameProps) {
+      this.setState({
+        tileClassName: typeof tileClassName === 'function' ? tileClassName({ date, view }) : tileClassName,
+        tileClassNameProps: tileClassName,
+      });
     }
 
-    if (tileContent !== prevState.tileContentProps) {
-      nextState.tileContent = typeof tileContent === 'function' ? tileContent({ date, view }) : tileContent;
-      nextState.tileContentProps = tileContent;
+    if (tileContent !== tileContentProps) {
+      this.setState({
+        tileContent: typeof tileContent === 'function' ? tileContent({ date, view }) : tileContent,
+        tileContentProps: tileContent,
+      });
     }
-
-    return nextState;
   }
-
-  state = {};
 
   render() {
     const {
